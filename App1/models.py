@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import DateField
 
 # Create your models here.
 class Curso(models.Model):

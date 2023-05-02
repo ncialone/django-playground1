@@ -16,19 +16,18 @@ def estudiantes(request):
 def entregables(request):
     return render(request,'App1/entregables.html')
 
-def cursoFormulario(request):
-    if request.method == "POST":
-        miFormulario = CursoFormulario(request.POST) # Aqui me llega la informacion del html
+def cursos(request):
+    if request.method =='POST':
+        miFormulario=CursoFormulario(request.POST)
         print(miFormulario)
-            
         if miFormulario.is_valid:
-            informacion = miFormulario.cleaned_data
-            curso = Curso(int(informacion['id']),str(informacion['nombre']),int(informacion['curso']))
+            informacion=miFormulario.cleaned_data
+            curso=Curso(int(informacion['id']),str(informacion['nombre']),int(informacion['curso']))
             curso.save()
-        return render(request, "App1/inicio.html")
+            return render(request, 'App1/inicio.html')
     else:
-            miFormulario = CursoFormulario()
-    return render(request, "App1/cursoFormulario.html", {"miFormulario": miFormulario})
+        miFormulario=CursoFormulario()
+    return render(request, 'App1/cursos.html', {"miFormulario": miFormulario})
 
 def profesorFormulario(request):
     if request.method == "POST":
@@ -67,10 +66,24 @@ def entregableFormulario(request):
         
         if miFormulario.is_valid:
             informacion = miFormulario.cleaned_data
-            curso = Entregable(int(informacion['id']),str(informacion['nombre']),(informacion['fechaentrega']), #LA FECHA SE INGRESA EN FORMATO YYYY-MM-DD!!!!!!!
+                                                                                #LA FECHA SE INGRESA EN FORMATO YYYY-MM-DD!!!!!!!
+            curso = Entregable(int(informacion['id']),str(informacion['nombre']),(informacion['fechaentrega']), 
                                 bool(['entregado'])) 
             curso.save()
             return render(request, "App1/inicio.html")
     else:
         miFormulario = EntregableFormulario()       
     return render(request, "App1/entregableFormulario.html", {"miFormulario": miFormulario})
+
+def busquedaCurso(request):
+    return render(request,'App1/busquedaCurso.html')
+
+def buscar(request):
+    if request.GET['curso']:
+        curso = request.GET['curso']
+        cursos= Curso.objects.filter(curso__exact=curso) #LLEGA EL CURSO, FILTRAMOS Y BUSCAMOS EN BD
+        if cursos.exists():
+            return render(request,'App1/resultadosBusqueda.html', {"cursos":cursos, "comisiones": curso })
+        else:
+            respuesta= "Datos no encontrados"      
+    return HttpResponse(respuesta)
